@@ -20,6 +20,22 @@ class ExchangeWatcher(watcherEditText: EditText) : TextWatcher {
         isBlocked = false
     }
 
+    fun convertCurrency(num: Double) {
+        oppositeWatcher?.block()
+
+        val oppositeRatio: Double = oppositeWatcher?.conversionRatio ?: 1.0
+        val converted = num * conversionRatio / oppositeRatio
+
+        val power: Int = max(0, Math.floor(Math.log10(converted)).toInt())
+        val bound: Int = min(converted.toString().length, power + 7) - 1
+        val rounded = converted.toString().substring(0..bound)
+
+        val out = Editable.Factory.getInstance().newEditable(rounded)
+        oppositeWatcher?.editText?.text = out
+
+        oppositeWatcher?.unblock()
+    }
+
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -30,19 +46,7 @@ class ExchangeWatcher(watcherEditText: EditText) : TextWatcher {
         val str = p0.toString()
         val num: Double? = str.toDoubleOrNull()
         if (num != null) {
-            oppositeWatcher?.block()
-
-            val oppositeRatio: Double = oppositeWatcher?.conversionRatio ?: 1.0
-            val converted = num * conversionRatio / oppositeRatio
-
-            val power: Int = max(0, Math.floor(Math.log10(converted)).toInt())
-            val bound: Int = min(converted.toString().length, power + 6) - 1
-            val rounded = converted.toString().substring(0..bound)
-
-            val out = Editable.Factory.getInstance().newEditable(rounded)
-            oppositeWatcher?.editText?.text = out
-
-            oppositeWatcher?.unblock()
+            convertCurrency(num)
         }
     }
 }

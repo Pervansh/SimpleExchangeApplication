@@ -14,5 +14,9 @@ class ExchageSpinnerListner(watcher: ExchangeWatcher,
     override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val code = adapterView?.selectedItem as String
         watcher.conversionRatio = coursesMap[code]?: watcher.conversionRatio
+        val num = watcher.oppositeWatcher?.editText?.text.toString().toDoubleOrNull()
+        if (num != null) {
+            watcher.oppositeWatcher?.convertCurrency(num)
+        }
     }
 }
